@@ -4,11 +4,10 @@ import shlex
 GET_METADATA_COMMAND = 'rbd image-meta get {imagespec} {key}'
 SET_METADATA_COMMAND = 'rbd image-meta set {imagespec} {key} {value}'
 
-def get_metadata(pool, device, key):
+def get_metadata(imagespec, key):
     """
     Get RBD metadata for a device
     """
-    imagespec = "{pool}/{device}".format(pool=pool, device=device)
     command = shlex.split(GET_METADATA_COMMAND.format(
         imagespec=imagespec, key=key))
     p = subprocess.Popen(command, stdout=subprocess.PIPE,
@@ -21,11 +20,10 @@ def get_metadata(pool, device, key):
     return value
 
 
-def set_metadata(pool, device, key, value):
+def set_metadata(imagespec, key, value):
     """
     Set RBD metadata for a device
     """
-    imagespec = "{pool}/{device}".format(pool=pool, device=device)
     command = shlex.split(SET_METADATA_COMMAND.format(
         imagespec=imagespec, key=key, value=value))
     p = subprocess.Popen(command, stdout=subprocess.PIPE,

@@ -3,6 +3,7 @@ import argparse
 from nebula_rbd_metadata import api
 from nebula_rbd_metadata import utils
 from nebula_rbd_metadata import logger
+from nebula_rbd_metadata import monitor
 
 
 def daemon(args, one_args, etcd_args):
@@ -14,7 +15,7 @@ def runonce(args, one_args):
     nebula_rbd_metadata = api.nebula_rbd_metadata(one_kwargs=one_args)
     nebula_rbd_metadata.sync()
 
-def shell(args, one_args, etcd_args):
+def shell(args, one_args):
     nebula_rbd_metadata_monitor = monitor.nebula_rbd_metadata_monitor(one_kwargs=one_args)
     oneclient = nebula_rbd_metadata_monitor._one
     ns = dict(nebula_rbd_metadata_monitor=nebula_rbd_metadata_monitor,

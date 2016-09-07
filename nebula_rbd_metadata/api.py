@@ -1,6 +1,6 @@
 from nebula_rbd_metadata import exception
+from nebula_rbd_metadata import ceph
 from nebula_rbd_metadata.clients import one
-from nebula_rbd_metadata.clients import skydns
 from nebula_rbd_metadata.logger import log
 
 
@@ -34,11 +34,14 @@ class nebula_rbd_metadata(object):
         Returns an array of rbd devices
         """
         vm_id = vm.id
+        log.debug("vm " + str(vm_id))
         disk_array = []
         for disk in vm.template.disks:
-            disk_array.append('{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
-                    pool=disk.pool_name, image_id=disk.image_id, vm_id=vm_id,
-                    disk_id=disk.disk_id))
+            log.debug(disk)
+            if hasattr(disk, 'image_id'):
+                disk_array.append('{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
+                        pool=disk.pool_name, image_id=disk.image_id, vm_id=vm_id,
+                        disk_id=disk.disk_id))
         return disk_array
 
 
@@ -46,7 +49,7 @@ class nebula_rbd_metadata(object):
         """
         Checks for image template variable BACKUP=true
         """
-        if hasattr(image.template.BACKUP):
+        if hasattr(image.template, 'BACKUP'):
             if image.template.BACKUP.lower() == 'true':
                 return True
         return False
@@ -64,7 +67,7 @@ class nebula_rbd_metadata(object):
         images_addedtrue = []
         images_addedfalse = []
         for vm in self._one.vms():
-            vm_backup_flag = self._check_vm_for_backup:
+            vm_backup_flag = self._check_vm_for_backup(vm)
             try:
                 self._check_for_disks(vm)
                 for disk_imagespec in self._get_disk_names(vm):
@@ -75,7 +78,7 @@ class nebula_rbd_metadata(object):
                             ' true'.format(imagespec=disk_imagespec))
                         ceph.set_metadata(imagespec=disk_imagespec,
                             key='backup', value='true')
-                    if ! vm_backup_flag and disk_metadata_lower == 'true':
+                    if (not vm_backup_flag and disk_metadata_lower == 'true'):
                         log.debug('setting disk {imagespec} to backup'
                             ' false'.format(imagespec=disk_imagespec))
                         ceph.set_metadata(imagespec=disk_imagespec,
@@ -92,9 +95,11 @@ class nebula_rbd_metadata(object):
                         ' true'.format(imagespec=image.source))
                     ceph.set_metadata(imagespec=image.source, key='backup',
                         value='true')
-                if ! image.backup_flag and image_metadata_lower == 'true':
+                if (not image.backup_flag and image_metadata_lower == 'true'):
                     log.debug('setting image {imagespec} to backup'
                         ' false'.format(imagespec=image.source))
                     ceph.set_metadata(imagespec=image.source, key='backup',
                         value='false')
+            except:
+                pass
         log.info('done')
