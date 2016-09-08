@@ -18,8 +18,8 @@ class nebula_rbd_metadata(object):
         """
         Checks a vm template variable for BACKUP=true
         """
-        if hasattr(vm.user_template, 'BACKUP'):
-            if vm.user_template.BACKUP.lower() == 'true':
+        if hasattr(vm.user_template, 'backup'):
+            if vm.user_template.backup.lower() == 'true':
                 return True
         return False
 
@@ -49,8 +49,8 @@ class nebula_rbd_metadata(object):
         """
         Checks for image template variable BACKUP=true
         """
-        if hasattr(image.template, 'BACKUP'):
-            if image.template.BACKUP.lower() == 'true':
+        if hasattr(image.template, 'backup'):
+            if image.template.backup.lower() == 'true':
                 return True
         return False
 
