@@ -85,6 +85,8 @@ class nebula_rbd_metadata(object):
                             key='backup', value='false')
             except exception.NoDisksError as e:
                 e.log(warn=True)
+            except exception.CantSetMetadataError as e:
+                e.log(warn=True)
         for image in self._one.images():
             image_backup_flag = self._check_image_for_backup(image)
             try:
@@ -100,6 +102,6 @@ class nebula_rbd_metadata(object):
                         ' false'.format(imagespec=image.source))
                     ceph.set_metadata(imagespec=image.source, key='backup',
                         value='false')
-            except:
-                pass
+            except exception.CantSetMetadataError as e:
+                e.log(warn=True)
         log.info('done')

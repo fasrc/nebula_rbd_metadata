@@ -1,5 +1,6 @@
 import subprocess
 import shlex
+from nebula_rbd_metadata import exception
 
 GET_METADATA_COMMAND = 'rbd image-meta get {imagespec} {key}'
 SET_METADATA_COMMAND = 'rbd image-meta set {imagespec} {key} {value}'
@@ -30,5 +31,5 @@ def set_metadata(imagespec, key, value):
         stderr = subprocess.PIPE)
     stdout, stderr = p.communicate()
     if p.returncode != 0:
-        raise CantSetMetadatError
+        raise exception.CantSetMetadataError(imagespec, key, value, p.returncode, stderr)
     return True

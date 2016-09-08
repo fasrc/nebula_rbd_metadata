@@ -28,8 +28,10 @@ class NoDisksError(nebula_rbd_metadataException):
                                                              id=vm.id)
 
 
-class CantSetMetadataErrror(nebula_rbd_metadataException):
-    def __init__(self, pool, device, key, value):
-        self.msg = ("Metadata could not be set for device {pool}/{device}:"
-                    "{key} {value}".format(pool=pool, device=device, key=key,
-                                           value=value))
+class CantSetMetadataError(nebula_rbd_metadataException):
+    def __init__(self, imagespec, key, value, returncode, stderr):
+        self.msg = ("Metadata could not be set for device {imagespec}:"
+                    " {key} {value}: exit code {returncode} stderr"
+                    " {stderr}".format(imagespec=imagespec, key=key,
+                                           value=value, returncode=returncode,
+                                           stderr=stderr))
