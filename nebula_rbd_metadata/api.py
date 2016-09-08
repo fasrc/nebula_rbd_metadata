@@ -95,7 +95,7 @@ class nebula_rbd_metadata(object):
                         ' true'.format(imagespec=image.source))
                     ceph.set_metadata(imagespec=image.source, key='backup',
                         value='true')
-                if (not image.backup_flag and image_metadata_lower == 'true'):
+                if (not image_backup_flag and image_metadata_lower == 'true'):
                     log.debug('setting image {imagespec} to backup'
                         ' false'.format(imagespec=image.source))
                     ceph.set_metadata(imagespec=image.source, key='backup',
