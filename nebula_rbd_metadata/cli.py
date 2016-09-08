@@ -6,7 +6,7 @@ from nebula_rbd_metadata import logger
 from nebula_rbd_metadata import monitor
 
 
-def daemon(args, one_args, etcd_args):
+def daemon(args, one_args):
     mon = monitor.nebula_rbd_metadata_monitor(one_kwargs=one_args)
     mon.run(args.interval)
 
