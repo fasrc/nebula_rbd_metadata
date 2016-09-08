@@ -34,10 +34,10 @@ class nebula_rbd_metadata(object):
         Returns an array of rbd devices
         """
         vm_id = vm.id
-        log.debug("vm " + str(vm_id))
+        # log.debug("vm " + str(vm_id))
         disk_array = []
         for disk in vm.template.disks:
-            log.debug(disk)
+            # log.debug(disk)
             if hasattr(disk, 'image_id'):
                 disk_array.append('{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
                         pool=disk.pool_name, image_id=disk.image_id, vm_id=vm_id,
