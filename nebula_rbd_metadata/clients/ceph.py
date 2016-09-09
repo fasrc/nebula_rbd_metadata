@@ -14,17 +14,17 @@ class CephClient(object):
     Ceph client for setting RBD metadata
     (Note, Python librbd bindings do not support rbd metadata yet)
     """
-    def __init__(self, ceph_cluster=None, ceph_user=None):
-        self._ceph_cluster = ceph_cluster
-        self._ceph_user = ceph_user
+    def __init__(self, cluster=None, user=None):
+        self._cluster = cluster
+        self._user = user
 
 
-    def get_metadata(imagespec, key):
+    def get_metadata(self, imagespec, key):
         """
         Get RBD metadata for a device
         """
         command = shlex.split(GET_METADATA_COMMAND.format(
-            cluster=self._ceph_cluster, user=self._ceph_user,
+            cluster=self._cluster, user=self._user,
             imagespec=imagespec, key=key))
         p = subprocess.Popen(command, stdout=subprocess.PIPE,
             stderr = subprocess.PIPE)
@@ -36,12 +36,12 @@ class CephClient(object):
         return value
 
 
-    def set_metadata(imagespec, key, value):
+    def set_metadata(self, imagespec, key, value):
         """
         Set RBD metadata for a device
         """
         command = shlex.split(SET_METADATA_COMMAND.format(
-            cluster=self._ceph_cluster, user=self._ceph_user,
+            cluster=self._cluster, user=self._user,
             imagespec=imagespec, key=key, value=value))
         p = subprocess.Popen(command, stdout=subprocess.PIPE,
             stderr = subprocess.PIPE)

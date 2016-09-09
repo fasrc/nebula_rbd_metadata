@@ -6,17 +6,20 @@ from nebula_rbd_metadata import logger
 from nebula_rbd_metadata import monitor
 
 
-def daemon(args, one_args):
-    mon = monitor.nebula_rbd_metadata_monitor(one_kwargs=one_args)
+def daemon(args, one_args, ceph_args):
+    mon = monitor.nebula_rbd_metadata_monitor(one_kwargs=one_args,
+        ceph_kwargs=ceph_args)
     mon.run(args.interval)
 
 
-def runonce(args, one_args):
-    nebula_rbd_metadata = api.nebula_rbd_metadata(one_kwargs=one_args)
+def runonce(args, one_args, ceph_args):
+    nebula_rbd_metadata = api.nebula_rbd_metadata(one_kwargs=one_args,
+        ceph_kwargs=ceph_args)
     nebula_rbd_metadata.sync()
 
-def shell(args, one_args):
-    nebula_rbd_metadata_monitor = monitor.nebula_rbd_metadata_monitor(one_kwargs=one_args)
+def shell(args, one_args, ceph_args):
+    nebula_rbd_metadata_monitor = monitor.nebula_rbd_metadata_monitor(
+        one_kwargs=one_args, ceph_kwargs=ceph_args)
     oneclient = nebula_rbd_metadata_monitor._one
     ns = dict(nebula_rbd_metadata_monitor=nebula_rbd_metadata_monitor,
               oneclient=oneclient, log=logger.log)
@@ -40,7 +43,7 @@ def main(args=None):
                         help='proxy host to use to connect to ONE controller')
     parser.add_argument('--ceph-cluster', required=False, default='ceph',
                         help='ceph cluster')
-    parser.add-arguemnt('--ceph-user', required=False, default='admin',
+    parser.add_argument('--ceph-user', required=False, default='admin',
                         help='ceph user')
 
     subparsers = parser.add_subparsers()

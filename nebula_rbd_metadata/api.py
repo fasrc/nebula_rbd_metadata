@@ -1,6 +1,7 @@
 from nebula_rbd_metadata import exception
 from nebula_rbd_metadata import ceph
 from nebula_rbd_metadata.clients import one
+from nebula_rbd_metadata.clients import ceph
 from nebula_rbd_metadata.logger import log
 
 
@@ -10,10 +11,10 @@ class nebula_rbd_metadata(object):
     metadata
     """
 
-    def __init__(self, one_kwargs={}):
+    def __init__(self, one_kwargs={}, ceph_kwargs={}):
         try:
             self._one = one.OneClient(**one_kwargs)
-            self._ceph = one.CephClient(**ceph_kwargs)
+            self._ceph = ceph.CephClient(**ceph_kwargs)
         except exception.SecretFileError as e:
             e.log()
             raise
@@ -76,6 +77,7 @@ class nebula_rbd_metadata(object):
             try:
                 self._check_for_disks(vm)
                 for disk_imagespec in self._get_disk_names(vm):
+                    log.debug(disk_imagespec)
                     disk_metadata_lower = self._ceph.get_metadata(imagespec=disk_imagespec,
                         key='backup').lower()
                     if vm_backup_flag and disk_metadata_lower != 'true':
