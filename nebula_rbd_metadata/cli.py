@@ -64,7 +64,6 @@ def main(args=None):
 
     args_dict = vars(args)
     one_args = utils.get_kwargs_from_dict(args_dict, 'one_')
+    ceph_args = utils.get_kwargs_from_dict(args_dict, 'ceph_')
 
-    # process ceph args
-
-    args.func(args, one_args)
+    args.func(args, one_args, ceph_args)

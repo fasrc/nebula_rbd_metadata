@@ -2,34 +2,50 @@ import subprocess
 import shlex
 from nebula_rbd_metadata import exception
 
-GET_METADATA_COMMAND = 'rbd image-meta get {imagespec} {key}'
-SET_METADATA_COMMAND = 'rbd image-meta set {imagespec} {key} {value}'
+GET_METADATA_COMMAND = ('rbd --cluster {cluster} --id {user} image-meta'
+                        ' get {imagespec} {key}')
 
-def get_metadata(imagespec, key):
-    """
-    Get RBD metadata for a device
-    """
-    command = shlex.split(GET_METADATA_COMMAND.format(
-        imagespec=imagespec, key=key))
-    p = subprocess.Popen(command, stdout=subprocess.PIPE,
-        stderr = subprocess.PIPE)
-    stdout, stderr = p.communicate()
-    value = stdout.strip('\n')
-    if p.returncode != 0:
-        # this is OK if a vm doesn't have any metadata yet
-        pass
-    return value
+SET_METADATA_COMMAND = ('rbd --cluster {cluster} --id {user} image-meta'
+                        ' set {imagespec} {key} {value}')
 
 
-def set_metadata(imagespec, key, value):
+class CephClient(object):
     """
-    Set RBD metadata for a device
+    Ceph client for setting RBD metadata
+    (Note, Python librbd bindings do not support rbd metadata yet)
     """
-    command = shlex.split(SET_METADATA_COMMAND.format(
-        imagespec=imagespec, key=key, value=value))
-    p = subprocess.Popen(command, stdout=subprocess.PIPE,
-        stderr = subprocess.PIPE)
-    stdout, stderr = p.communicate()
-    if p.returncode != 0:
-        raise exception.CantSetMetadataError(imagespec, key, value, p.returncode, stderr)
-    return True
+    def __init__(self, ceph_cluster=None, ceph_user=None):
+        self._ceph_cluster = ceph_cluster
+        self._ceph_user = ceph_user
+
+
+    def get_metadata(imagespec, key):
+        """
+        Get RBD metadata for a device
+        """
+        command = shlex.split(GET_METADATA_COMMAND.format(
+            cluster=self._ceph_cluster, user=self._ceph_user,
+            imagespec=imagespec, key=key))
+        p = subprocess.Popen(command, stdout=subprocess.PIPE,
+            stderr = subprocess.PIPE)
+        stdout, stderr = p.communicate()
+        value = stdout.strip('\n')
+        if p.returncode != 0:
+            # this is OK if a vm doesn't have any metadata yet
+            pass
+        return value
+
+
+    def set_metadata(imagespec, key, value):
+        """
+        Set RBD metadata for a device
+        """
+        command = shlex.split(SET_METADATA_COMMAND.format(
+            cluster=self._ceph_cluster, user=self._ceph_user,
+            imagespec=imagespec, key=key, value=value))
+        p = subprocess.Popen(command, stdout=subprocess.PIPE,
+            stderr = subprocess.PIPE)
+        stdout, stderr = p.communicate()
+        if p.returncode != 0:
+            raise exception.CantSetMetadataError(imagespec, key, value, p.returncode, stderr)
+        return True

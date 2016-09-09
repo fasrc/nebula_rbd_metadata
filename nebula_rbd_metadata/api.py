@@ -13,6 +13,7 @@ class nebula_rbd_metadata(object):
     def __init__(self, one_kwargs={}):
         try:
             self._one = one.OneClient(**one_kwargs)
+            self._ceph = one.CephClient(**ceph_kwargs)
         except exception.SecretFileError as e:
             e.log()
             raise
@@ -75,17 +76,17 @@ class nebula_rbd_metadata(object):
             try:
                 self._check_for_disks(vm)
                 for disk_imagespec in self._get_disk_names(vm):
-                    disk_metadata_lower = ceph.get_metadata(imagespec=disk_imagespec, 
+                    disk_metadata_lower = self._ceph.get_metadata(imagespec=disk_imagespec,
                         key='backup').lower()
                     if vm_backup_flag and disk_metadata_lower != 'true':
                         log.debug('setting disk {imagespec} to backup'
                             ' true'.format(imagespec=disk_imagespec))
-                        ceph.set_metadata(imagespec=disk_imagespec,
+                        self._ceph.set_metadata(imagespec=disk_imagespec,
                             key='backup', value='true')
                     if (not vm_backup_flag and disk_metadata_lower == 'true'):
                         log.debug('setting disk {imagespec} to backup'
                             ' false'.format(imagespec=disk_imagespec))
-                        ceph.set_metadata(imagespec=disk_imagespec,
+                        self._ceph.set_metadata(imagespec=disk_imagespec,
                             key='backup', value='false')
             except exception.NoDisksError as e:
                 e.log(warn=True)
@@ -94,17 +95,17 @@ class nebula_rbd_metadata(object):
         for image in self._one.images():
             image_backup_flag = self._check_image_for_backup(image)
             try:
-                image_metadata_lower = ceph.get_metadata(imagespec=image.source,
+                image_metadata_lower = self._ceph.get_metadata(imagespec=image.source,
                     key='backup').lower()
                 if image_backup_flag and image_metadata_lower != 'true':
                     log.debug('setting image {imagespec} to backup'
                         ' true'.format(imagespec=image.source))
-                    ceph.set_metadata(imagespec=image.source, key='backup',
+                    self._ceph.set_metadata(imagespec=image.source, key='backup',
                         value='true')
                 if (not image_backup_flag and image_metadata_lower == 'true'):
                     log.debug('setting image {imagespec} to backup'
                         ' false'.format(imagespec=image.source))
-                    ceph.set_metadata(imagespec=image.source, key='backup',
+                    self._ceph.set_metadata(imagespec=image.source, key='backup',
                         value='false')
             except exception.CantSetMetadataError as e:
                 e.log(warn=True)
