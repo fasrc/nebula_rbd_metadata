@@ -38,6 +38,10 @@ def main(args=None):
                         ' /path/to/one_auth)')
     parser.add_argument('--one-proxy', required=False,
                         help='proxy host to use to connect to ONE controller')
+    parser.add_argument('--ceph-cluster', required=False, default='ceph',
+                        help='ceph cluster')
+    parser.add-arguemnt('--ceph-user', required=False, default='admin',
+                        help='ceph user')
 
     subparsers = parser.add_subparsers()
 
@@ -60,5 +64,7 @@ def main(args=None):
 
     args_dict = vars(args)
     one_args = utils.get_kwargs_from_dict(args_dict, 'one_')
+
+    # process ceph args
 
     args.func(args, one_args)
