@@ -7,15 +7,16 @@ from nebula_rbd_metadata import monitor
 
 
 def daemon(args, one_args, ceph_args):
-    mon = monitor.nebula_rbd_metadata_monitor(one_kwargs=one_args,
-        ceph_kwargs=ceph_args)
+    mon = monitor.nebula_rbd_metadata_monitor(
+        one_kwargs=one_args, ceph_kwargs=ceph_args)
     mon.run(args.interval)
 
 
 def runonce(args, one_args, ceph_args):
-    nebula_rbd_metadata = api.nebula_rbd_metadata(one_kwargs=one_args,
-        ceph_kwargs=ceph_args)
+    nebula_rbd_metadata = api.nebula_rbd_metadata(
+        one_kwargs=one_args, ceph_kwargs=ceph_args)
     nebula_rbd_metadata.sync()
+
 
 def shell(args, one_args, ceph_args):
     nebula_rbd_metadata_monitor = monitor.nebula_rbd_metadata_monitor(
@@ -29,7 +30,7 @@ def shell(args, one_args, ceph_args):
 def main(args=None):
     parser = argparse.ArgumentParser(
         description='nebula_rbd_metadata - sync nebula variables with'
-            ' rbd metadata')
+                    ' rbd metadata')
     parser.add_argument('--debug', required=False,
                         action='store_true', default=False,
                         help='ONE controller host address')
@@ -56,7 +57,6 @@ def main(args=None):
 
     runonce_parser = subparsers.add_parser('runonce')
     runonce_parser.set_defaults(func=runonce)
-
 
     shell_parser = subparsers.add_parser('shell')
     shell_parser.set_defaults(func=shell)

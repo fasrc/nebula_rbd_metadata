@@ -24,8 +24,8 @@ class NoDisksError(nebula_rbd_metadataException):
     Raised when a VM doesn't have any disks
     """
     def __init__(self, vm):
-        self.msg = "No disks found for VM {id}: {vm}".format(vm=vm.name,
-                                                             id=vm.id)
+        self.msg = "No disks found for VM {id}: {vm}".format(
+            vm=vm.name, id=vm.id)
 
 
 class CantSetMetadataError(nebula_rbd_metadataException):
@@ -33,8 +33,9 @@ class CantSetMetadataError(nebula_rbd_metadataException):
         self.msg = ("Metadata could not be set for device {imagespec}:"
                     " {key} {value}: exit code {returncode} stderr"
                     " {stderr}".format(imagespec=imagespec, key=key,
-                                           value=value, returncode=returncode,
-                                           stderr=stderr))
+                                       value=value, returncode=returncode,
+                                       stderr=stderr))
+
 
 class SecretFileError(nebula_rbd_metadataException):
     def __init__(self, secretfile, e):

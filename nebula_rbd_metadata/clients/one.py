@@ -8,11 +8,11 @@ class OneClient(object):
     OpenNebula Python client
     """
     def __init__(self, secret=None, address=None, proxy=None):
-        if ( secret[0] == '/' ):
+        if (secret[0] == '/'):
             secretfile = secret
             if os.path.isfile(secretfile):
                 try:
-                    f = open(secretfile,'r')
+                    f = open(secretfile, 'r')
                     secret = f.readlines()[0].strip('\n')
                     f.close()
                 except (IOError, OSError) as e:

@@ -24,15 +24,17 @@ formatter = logging.Formatter(LOG_FORMAT)
 console.setFormatter(formatter)
 
 
-def configure_nebula_rbd_metadata_logging(use_syslog=False, syslog_device='/dev/log',
-                             debug=False):
+def configure_nebula_rbd_metadata_logging(use_syslog=False,
+                                          syslog_device='/dev/log',
+                                          debug=False):
     """
     Configure logging for nebula_rbd_metadata *application* code
 
-    By default nebula_rbd_metadata's logger has no formatters and a NullHandler so that
-    other developers using nebula_rbd_metadata as a library can configure logging as
-    they see fit. This method is used in nebula_rbd_metadata's application code (i.e.
-    the 'nebula_rbd_metadata' command) to toggle nebula_rbd_metadata's application specific
+    By default nebula_rbd_metadata's logger has no formatters and a NullHandler
+    so that other developers using nebula_rbd_metadata as a library can
+    configure logging as they see fit. This method is used in
+    nebula_rbd_metadata's application code (i.e. the 'nebula_rbd_metadata'
+    command) to toggle nebula_rbd_metadata's application specific
     formatters/handlers
 
     use_syslog - enable logging all messages to syslog. currently only works if
