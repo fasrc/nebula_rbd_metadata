@@ -21,6 +21,7 @@ setup(
     install_requires=[
         "oca>=4.10.0",
     ],
-    entry_points=dict(console_scripts=['nebula_rbd_metadata = nebula_rbd_metadata.cli:main']),
+    entry_points=dict(console_scripts=[
+        'nebula_rbd_metadata = nebula_rbd_metadata.cli:main']),
     zip_safe=False
 )

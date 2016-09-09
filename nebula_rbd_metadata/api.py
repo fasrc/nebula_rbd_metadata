@@ -1,5 +1,4 @@
 from nebula_rbd_metadata import exception
-from nebula_rbd_metadata import ceph
 from nebula_rbd_metadata.clients import one
 from nebula_rbd_metadata.clients import ceph
 from nebula_rbd_metadata.logger import log
@@ -19,7 +18,6 @@ class nebula_rbd_metadata(object):
             e.log()
             raise
 
-
     def _check_vm_for_backup(self, vm):
         """
         Checks a vm template variable for BACKUP=true
@@ -29,11 +27,9 @@ class nebula_rbd_metadata(object):
                 return True
         return False
 
-
     def _check_for_disks(self, vm):
         if not hasattr(vm.template, 'disks'):
             raise exception.NoDisksError(vm)
-
 
     def _get_disk_names(self, vm):
         """
@@ -50,7 +46,6 @@ class nebula_rbd_metadata(object):
                         disk_id=disk.disk_id))
         return disk_array
 
-
     def _check_image_for_backup(self, image):
         """
         Checks for image template variable BACKUP=true
@@ -60,7 +55,6 @@ class nebula_rbd_metadata(object):
                 return True
         return False
 
-
     def _get_image_imagespec(self, image):
         """
         Gets the rbd device in imagespec format for an opennebula image
@@ -68,6 +62,9 @@ class nebula_rbd_metadata(object):
         return image.source
 
     def sync(self):
+        """
+        Sync metadata from nebula template variables to rbd metadata
+        """
         vms_addedtrue = []
         vms_addedfalse = []
         images_addedtrue = []
