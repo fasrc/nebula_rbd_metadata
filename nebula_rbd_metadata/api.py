@@ -11,7 +11,11 @@ class nebula_rbd_metadata(object):
     """
 
     def __init__(self, one_kwargs={}):
-        self._one = one.OneClient(**one_kwargs)
+        try:
+            self._one = one.OneClient(**one_kwargs)
+        except exception.SecretFileError as e:
+            e.log()
+            raise
 
 
     def _check_vm_for_backup(self, vm):

@@ -34,7 +34,8 @@ def main(args=None):
     parser.add_argument('--one-address', required=False,
                         help='ONE controller host address')
     parser.add_argument('--one-secret', required=False,
-                        help='ONE credentials to use (e.g. user:key)')
+                        help='ONE credentials to use (e.g. user:key, or'
+                        ' /path/to/one_auth)')
     parser.add_argument('--one-proxy', required=False,
                         help='proxy host to use to connect to ONE controller')
 

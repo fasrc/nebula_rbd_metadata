@@ -35,3 +35,8 @@ class CantSetMetadataError(nebula_rbd_metadataException):
                     " {stderr}".format(imagespec=imagespec, key=key,
                                            value=value, returncode=returncode,
                                            stderr=stderr))
+
+class SecretFileError(nebula_rbd_metadataException):
+    def __init__(self, secretfile, e):
+        self.msg = ("Error reading OpenNebula secret file {secretfile} with"
+                    " error: {e}".format(secretfile=secretfile, e=e))
