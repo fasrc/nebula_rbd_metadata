@@ -4,6 +4,7 @@ from nebula_rbd_metadata import api
 from nebula_rbd_metadata import utils
 from nebula_rbd_metadata import logger
 from nebula_rbd_metadata import monitor
+import os
 
 
 def daemon(args, one_args, ceph_args):
@@ -32,20 +33,37 @@ def main(args=None):
         description='nebula_rbd_metadata - sync nebula variables with'
                     ' rbd metadata')
     parser.add_argument('--debug', required=False,
-                        action='store_true', default=False,
-                        help='ONE controller host address')
-
+                        action='store_true',
+                        default=(
+                            os.environ.get('NEB_RBD_MET_DEBUG','False').lower() ==
+                            'true'),
+                        help='enable debug output')
     parser.add_argument('--one-address', required=False,
+                        default=(
+                            os.environ.get('NEB_RBD_MET_ONE_ADDRESS')),
                         help='ONE controller host address')
     parser.add_argument('--one-secret', required=False,
-                        help='ONE credentials to use (e.g. user:key, or'
-                        ' /path/to/one_auth)')
+                        default=(
+                            os.environ.get('NEB_RBD_MET_ONE_SECRET',
+                            '/var/lib/one/.one/one_auth')),
+                        help=(
+                            'ONE credentials to use (e.g. user:key, or'
+                            ' /path/to/one_auth),'
+                            ' default /var/lib/one/.one/one_auth'))
     parser.add_argument('--one-proxy', required=False,
+                        default=(
+                            os.environ.get('NEB_RBD_MET_ONE_PROXY')),
                         help='proxy host to use to connect to ONE controller')
-    parser.add_argument('--ceph-cluster', required=False, default='ceph',
-                        help='ceph cluster')
-    parser.add_argument('--ceph-user', required=False, default='admin',
-                        help='ceph user')
+    parser.add_argument('--ceph-cluster', required=False,
+                        default=(
+                            os.environ.get(
+                                'NEB_RBD_MET_CEPH_CLUSTER', 'ceph')),
+                        help='ceph cluster, default ceph')
+    parser.add_argument('--ceph-user', required=False,
+                        default=(
+                            os.environ.get(
+                                'NEB_RBD_MET_CEPH_CLUSTER', 'admin')),
+                        help='ceph user, default admin')
 
     subparsers = parser.add_subparsers()
 
