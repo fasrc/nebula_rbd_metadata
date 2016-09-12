@@ -67,16 +67,19 @@ def main(args=None):
 
     subparsers = parser.add_subparsers()
 
-    daemon_parser = subparsers.add_parser('daemon')
+    daemon_parser = subparsers.add_parser(
+        'daemon', help='run as daemon, sync every INTERVAL seconds')
     daemon_parser.set_defaults(func=daemon)
     daemon_parser.add_argument(
         '-i', '--interval', required=False, type=int, default=60,
         help="how often in seconds to poll ONE and update RBD metadata")
 
-    runonce_parser = subparsers.add_parser('runonce')
+    runonce_parser = subparsers.add_parser(
+        'runonce', help='run one sync and then exit')
     runonce_parser.set_defaults(func=runonce)
 
-    shell_parser = subparsers.add_parser('shell')
+    shell_parser = subparsers.add_parser(
+        'shell', help='enter debug shell')
     shell_parser.set_defaults(func=shell)
 
     args = parser.parse_args(args=args)
