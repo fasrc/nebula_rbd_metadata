@@ -35,8 +35,9 @@ def main(args=None):
     parser.add_argument('--debug', required=False,
                         action='store_true',
                         default=(
-                            os.environ.get('NEB_RBD_MET_DEBUG','False').lower() ==
-                            'true'),
+                            os.environ.get(
+                                'NEB_RBD_MET_DEBUG',
+                                'False').lower() == 'true'),
                         help='enable debug output')
     parser.add_argument('--one-address', required=False,
                         default=(
@@ -44,8 +45,9 @@ def main(args=None):
                         help='ONE controller host address')
     parser.add_argument('--one-secret', required=False,
                         default=(
-                            os.environ.get('NEB_RBD_MET_ONE_SECRET',
-                            '/var/lib/one/.one/one_auth')),
+                            os.environ.get(
+                                'NEB_RBD_MET_ONE_SECRET',
+                                '/var/lib/one/.one/one_auth')),
                         help=(
                             'ONE credentials to use (e.g. user:key, or'
                             ' /path/to/one_auth),'
