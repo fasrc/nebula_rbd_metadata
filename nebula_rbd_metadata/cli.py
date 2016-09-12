@@ -39,6 +39,15 @@ def main(args=None):
                                 'NEB_RBD_MET_DEBUG',
                                 'False').lower() == 'true'),
                         help='enable debug output')
+    parser.add_argument('--syslog', required=False,
+                        action='store_true',
+                        default=(
+                            os.environ.get(
+                                'NEB_RBD_MET_SYSLOG',
+                                'False').lower() == 'true'),
+                        help=(
+                            'enable logging to syslog, default false'
+                            ' (stdout only)'))
     parser.add_argument('--one-address', required=False,
                         default=(
                             os.environ.get('NEB_RBD_MET_ONE_ADDRESS')),
@@ -86,7 +95,8 @@ def main(args=None):
 
     args = parser.parse_args(args=args)
 
-    logger.configure_nebula_rbd_metadata_logging(debug=args.debug)
+    logger.configure_nebula_rbd_metadata_logging(
+        debug=args.debug, use_syslog=args.syslog)
 
     args_dict = vars(args)
     one_args = utils.get_kwargs_from_dict(args_dict, 'one_')

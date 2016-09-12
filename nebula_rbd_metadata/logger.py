@@ -5,6 +5,7 @@ import logging.handlers
 
 LOG_FORMAT = ("%(asctime)s %(filename)s:%(lineno)d - %(levelname)s - "
               "%(message)s")
+SYSLOG_FORMAT = "nebula_rbd_metadata: %(levelname)s - %(message)s"
 
 
 class NullHandler(logging.Handler):
@@ -50,4 +51,6 @@ def configure_nebula_rbd_metadata_logging(use_syslog=False,
         log.debug("Logging to %s" % syslog_device)
         syslog_handler = logging.handlers.SysLogHandler(address=syslog_device)
         syslog_handler.setLevel(logging.DEBUG)
+        syslog_formatter = logging.Formatter(SYSLOG_FORMAT)
+        syslog_handler.setFormatter(syslog_formatter)
         log.addHandler(syslog_handler)
