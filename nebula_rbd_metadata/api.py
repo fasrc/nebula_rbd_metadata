@@ -67,11 +67,14 @@ class nebula_rbd_metadata(object):
         Sync metadata from nebula template variables to rbd metadata
         """
         for vm in self._one.vms():
+            log.debug("checking vm id: {id} name: {vm}".format(
+                id=vm.id, vm=vm.name))
             vm_backup_flag = self._check_vm_for_backup(vm)
             try:
                 self._check_for_disks(vm)
                 for disk_imagespec in self._get_disk_names(vm):
-                    log.debug(disk_imagespec)
+                    log.debug("checking disk: {disk}".format(
+                        disk=disk_imagespec))
                     disk_metadata_lower = self._ceph.get_metadata(
                         imagespec=disk_imagespec, key='backup').lower()
                     if vm_backup_flag and disk_metadata_lower != 'true':
@@ -93,6 +96,9 @@ class nebula_rbd_metadata(object):
             except exception.CantSetMetadataError as e:
                 e.log(warn=True)
         for image in self._one.images():
+            log.debug(
+                "checking image id: {id} name: {name} source: {source}".format(
+                    id=image.id, name=image.name, source=image.source))
             image_backup_flag = self._check_image_for_backup(image)
             try:
                 image_metadata_lower = self._ceph.get_metadata(
