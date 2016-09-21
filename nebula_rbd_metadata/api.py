@@ -70,7 +70,7 @@ class nebula_rbd_metadata(object):
             vm_backup_flag = self._check_vm_for_backup(vm)
             log.debug(
                 "checking vm id: {id} name: '{name}'"
-                " has nebula[BACKUP]={neb_backup}".format(
+                " has nebula variable BACKUP={neb_backup}".format(
                     id=vm.id, name=vm.name, neb_backup=vm_backup_flag))
             try:
                 self._check_for_disks(vm)
@@ -97,9 +97,9 @@ class nebula_rbd_metadata(object):
                         continue
                     log.debug(
                         "OK vmid: {id} rbd disk: {disk}"
-                        " already has rbd[backup]={backup}".format(
+                        " already has rbd metadata backup='{rbd_backup}'".format(
                             id=vm.id, disk=disk_imagespec,
-                            backup=disk_metadata_lower))
+                            rbd_backup=disk_metadata_lower))
             except exception.NoDisksError as e:
                 e.log(warn=True)
             except exception.CantSetMetadataError as e:
@@ -108,7 +108,7 @@ class nebula_rbd_metadata(object):
             image_backup_flag = self._check_image_for_backup(image)
             log.debug(
                 "checking image id: {id} name: '{name}' source: {source}"
-                " has nebula[BACKUP]={neb_backup}".format(
+                " has nebula variable BACKUP={neb_backup}".format(
                     id=image.id, name=image.name, source=image.source,
                     neb_backup=image_backup_flag))
             try:
@@ -130,7 +130,7 @@ class nebula_rbd_metadata(object):
                     continue
                 log.debug(
                     "OK image: {id} rbd device: {source}"
-                    " already has rbd[backup]={rbd_backup}".format(
+                    " already has rbd metadata backup='{rbd_backup}'".format(
                         id=image.id,
                         source=image.source,
                         rbd_backup=image_metadata_lower))
