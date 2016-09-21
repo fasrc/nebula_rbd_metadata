@@ -97,7 +97,8 @@ class nebula_rbd_metadata(object):
                         continue
                     log.debug(
                         "OK vmid: {id} rbd disk: {disk}"
-                        " already has rbd metadata backup='{rbd_backup}'".format(
+                        " already has rbd metadata"
+                        " backup='{rbd_backup}'".format(
                             id=vm.id, disk=disk_imagespec,
                             rbd_backup=disk_metadata_lower))
             except exception.NoDisksError as e:
