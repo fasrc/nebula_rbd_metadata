@@ -75,13 +75,10 @@ class nebula_rbd_metadata(object):
             try:
                 self._check_for_disks(vm)
                 for disk_imagespec in self._get_disk_names(vm):
+                    log.debug("checking disk {imagespec}".format(
+                        imagespec=disk_imagespec))
                     disk_metadata_lower = self._ceph.get_metadata(
                         imagespec=disk_imagespec, key='backup').lower()
-                    log.debug(
-                        "checking vmid: {id} rbd disk: {disk}"
-                        " currently has rbd[backup]={backup}".format(
-                            id=vm.id, disk=disk_imagespec,
-                            backup=disk_metadata_lower))
                     if vm_backup_flag and disk_metadata_lower != 'true':
                         log.debug(
                             'setting disk {imagespec} to backup true'.format(
@@ -89,6 +86,7 @@ class nebula_rbd_metadata(object):
                         self._ceph.set_metadata(
                             imagespec=disk_imagespec, key='backup',
                             value='true')
+                        continue
                     if (not vm_backup_flag and disk_metadata_lower == 'true'):
                         log.debug(
                             'setting disk {imagespec} to backup false'.format(
@@ -96,6 +94,12 @@ class nebula_rbd_metadata(object):
                         self._ceph.set_metadata(
                             imagespec=disk_imagespec, key='backup',
                             value='false')
+                        continue
+                    log.debug(
+                        "OK vmid: {id} rbd disk: {disk}"
+                        " already has rbd[backup]={backup}".format(
+                            id=vm.id, disk=disk_imagespec,
+                            backup=disk_metadata_lower))
             except exception.NoDisksError as e:
                 e.log(warn=True)
             except exception.CantSetMetadataError as e:
@@ -110,24 +114,26 @@ class nebula_rbd_metadata(object):
             try:
                 image_metadata_lower = self._ceph.get_metadata(
                     imagespec=image.source, key='backup').lower()
-                log.debug(
-                    "checking image: {id} rbd device: {source}"
-                    " currently has rbd[backup]={rbd_backup}".format(
-                        id=image.id,
-                        source=image.source,
-                        rbd_backup=image_metadata_lower))
                 if image_backup_flag and image_metadata_lower != 'true':
                     log.debug(
                         'setting image {imagespec} to backup true'.format(
                             imagespec=image.source))
                     self._ceph.set_metadata(
                         imagespec=image.source, key='backup', value='true')
+                    continue
                 if (not image_backup_flag and image_metadata_lower == 'true'):
                     log.debug(
                         'setting image {imagespec} to backup false'.format(
                             imagespec=image.source))
                     self._ceph.set_metadata(
                         imagespec=image.source, key='backup', value='false')
+                    continue
+                log.debug(
+                    "OK image: {id} rbd device: {source}"
+                    " already has rbd[backup]={rbd_backup}".format(
+                        id=image.id,
+                        source=image.source,
+                        rbd_backup=image_metadata_lower))
             except exception.CantSetMetadataError as e:
                 e.log(warn=True)
         log.info('done')
