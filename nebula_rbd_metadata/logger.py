@@ -3,8 +3,7 @@ import logging
 import logging.handlers
 
 
-LOG_FORMAT = ("%(asctime)s %(filename)s:%(lineno)d - %(levelname)s - "
-              "%(message)s")
+LOG_FORMAT = ("%(asctime)s - %(levelname)s - %(message)s")
 SYSLOG_FORMAT = "nebula_rbd_metadata: %(levelname)s - %(message)s"
 
 
