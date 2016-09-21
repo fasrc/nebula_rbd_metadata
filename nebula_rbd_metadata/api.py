@@ -80,7 +80,7 @@ class nebula_rbd_metadata(object):
                     disk_metadata_lower = self._ceph.get_metadata(
                         imagespec=disk_imagespec, key='backup').lower()
                     if vm_backup_flag and disk_metadata_lower != 'true':
-                        log.debug(
+                        log.info(
                             'setting disk {imagespec} to backup true'.format(
                                 imagespec=disk_imagespec))
                         self._ceph.set_metadata(
@@ -88,7 +88,7 @@ class nebula_rbd_metadata(object):
                             value='true')
                         continue
                     if (not vm_backup_flag and disk_metadata_lower == 'true'):
-                        log.debug(
+                        log.info(
                             'setting disk {imagespec} to backup false'.format(
                                 imagespec=disk_imagespec))
                         self._ceph.set_metadata(
@@ -115,14 +115,14 @@ class nebula_rbd_metadata(object):
                 image_metadata_lower = self._ceph.get_metadata(
                     imagespec=image.source, key='backup').lower()
                 if image_backup_flag and image_metadata_lower != 'true':
-                    log.debug(
+                    log.info(
                         'setting image {imagespec} to backup true'.format(
                             imagespec=image.source))
                     self._ceph.set_metadata(
                         imagespec=image.source, key='backup', value='true')
                     continue
                 if (not image_backup_flag and image_metadata_lower == 'true'):
-                    log.debug(
+                    log.info(
                         'setting image {imagespec} to backup false'.format(
                             imagespec=image.source))
                     self._ceph.set_metadata(
