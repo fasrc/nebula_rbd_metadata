@@ -69,15 +69,19 @@ class nebula_rbd_metadata(object):
         for vm in self._one.vms():
             vm_backup_flag = self._check_vm_for_backup(vm)
             log.debug(
-                "checking vm id: {id} name: {vm} has backup={backup}".format(
-                    id=vm.id, vm=vm.name, backup=vm_backup_flag))
+                "checking vm id: {id} name: '{name}'"
+                " has nebula[BACKUP]={neb_backup}".format(
+                    id=vm.id, name=vm.name, neb_backup=vm_backup_flag))
             try:
                 self._check_for_disks(vm)
                 for disk_imagespec in self._get_disk_names(vm):
-                    log.debug("checking disk: {disk}".format(
-                        disk=disk_imagespec))
                     disk_metadata_lower = self._ceph.get_metadata(
                         imagespec=disk_imagespec, key='backup').lower()
+                    log.debug(
+                        "checking vmid: {id} rbd disk: {disk}"
+                        " currently has rbd[backup]={backup}".format(
+                            id=vm.id, disk=disk_imagespec,
+                            backup=disk_metadata_lower))
                     if vm_backup_flag and disk_metadata_lower != 'true':
                         log.debug(
                             'setting disk {imagespec} to backup true'.format(
@@ -99,13 +103,19 @@ class nebula_rbd_metadata(object):
         for image in self._one.images():
             image_backup_flag = self._check_image_for_backup(image)
             log.debug(
-                "checking image id: {id} name: {name} source: {source}"
-                " has backup={backup}".format(
+                "checking image id: {id} name: '{name}' source: {source}"
+                " has nebula[BACKUP]={neb_backup}".format(
                     id=image.id, name=image.name, source=image.source,
-                    backup=image_backup_flag))
+                    neb_backup=image_backup_flag))
             try:
                 image_metadata_lower = self._ceph.get_metadata(
                     imagespec=image.source, key='backup').lower()
+                log.debug(
+                    "checking image: {id} rbd device: {source}"
+                    " currently has rbd[backup]={rbd_backup}".format(
+                        id=image.id,
+                        source=image.source,
+                        rbd_backup=image_metadata_lower))
                 if image_backup_flag and image_metadata_lower != 'true':
                     log.debug(
                         'setting image {imagespec} to backup true'.format(
