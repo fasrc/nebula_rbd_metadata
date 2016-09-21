@@ -73,7 +73,7 @@ def main(args=None):
     parser.add_argument('--ceph-user', required=False,
                         default=(
                             os.environ.get(
-                                'NEB_RBD_MET_CEPH_CLUSTER', 'admin')),
+                                'NEB_RBD_MET_CEPH_USER', 'admin')),
                         help='ceph user, default admin')
 
     subparsers = parser.add_subparsers()
