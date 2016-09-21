@@ -47,7 +47,7 @@ class nebula_rbd_metadata(object):
                             vm_id=vm_id, disk_id=disk.disk_id))
             elif hasattr(disk, 'image_id') and hasattr(disk, 'source'):
                 disk_array.append('{source}-{vm_id}-{disk_id}'.format(
-                    source=vm.source, vm_id=vm_id, disk_id=disk.disk_id))
+                    source=disk.source, vm_id=vm_id, disk_id=disk.disk_id))
         return disk_array
 
     def _check_image_for_backup(self, image):
