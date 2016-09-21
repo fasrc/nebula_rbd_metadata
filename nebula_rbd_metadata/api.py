@@ -40,11 +40,14 @@ class nebula_rbd_metadata(object):
         disk_array = []
         for disk in vm.template.disks:
             # log.debug(disk)
-            if hasattr(disk, 'image_id'):
+            if hasattr(disk, 'image_id') and hasattr(disk, 'pool_name'):
                 disk_array.append(
                         '{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
                             pool=disk.pool_name, image_id=disk.image_id,
                             vm_id=vm_id, disk_id=disk.disk_id))
+            elif hasattr(disk, 'image_id') and hasattr(disk, 'source'):
+                disk_array.append('{source}-{vm_id}-{disk_id}'.format(
+                    source=vm.source, vm_id=vm_id, disk_id=disk.disk_id))
         return disk_array
 
     def _check_image_for_backup(self, image):
