@@ -40,7 +40,10 @@ class nebula_rbd_metadata(object):
         disk_array = []
         for disk in vm.template.disks:
             # log.debug(disk)
-            if hasattr(disk, 'image_id') and hasattr(disk, 'pool_name'):
+            if (hasattr(disk, 'image_id') and hasattr(disk, 'clone') and
+                    hasattr(disk, 'source') and disk.clone == 'NO'):
+                disk_array.append(disk.source)
+            elif hasattr(disk, 'image_id') and hasattr(disk, 'pool_name'):
                 disk_array.append(
                         '{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
                             pool=disk.pool_name, image_id=disk.image_id,
