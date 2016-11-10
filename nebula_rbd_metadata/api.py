@@ -80,7 +80,10 @@ class nebula_rbd_metadata(object):
                     id=vm.id, name=vm.name, neb_backup=vm_backup_flag))
             try:
                 self._check_for_disks(vm)
-                for disk_imagespec in self._get_disk_names(vm):
+            except exception.NoDisksError as e:
+                e.log(warn=True)
+            for disk_imagespec in self._get_disk_names(vm):
+                try:
                     log.debug("checking disk {imagespec}".format(
                         imagespec=disk_imagespec))
                     disk_metadata_lower = self._ceph.get_metadata(
@@ -107,10 +110,8 @@ class nebula_rbd_metadata(object):
                         " backup='{rbd_backup}'".format(
                             id=vm.id, disk=disk_imagespec,
                             rbd_backup=disk_metadata_lower))
-            except exception.NoDisksError as e:
-                e.log(warn=True)
-            except exception.CantSetMetadataError as e:
-                e.log(warn=True)
+                except exception.CantSetMetadataError as e:
+                    e.log(warn=True)
         for image in self._one.images():
             image_backup_flag = self._check_image_for_backup(image)
             log.debug(
