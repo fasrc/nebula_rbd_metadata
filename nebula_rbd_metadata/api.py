@@ -31,7 +31,7 @@ class nebula_rbd_metadata(object):
         if not hasattr(vm.template, 'disks'):
             raise exception.NoDisksError(vm)
 
-    def _get_disk_names(self, vm):
+    def _get_disks(self, vm):
         """
         Returns an array of rbd devices
         """
@@ -42,15 +42,16 @@ class nebula_rbd_metadata(object):
             # log.debug(disk)
             if (hasattr(disk, 'image_id') and hasattr(disk, 'clone') and
                     hasattr(disk, 'source') and disk.clone == 'NO'):
-                disk_array.append(disk.source)
+                disk_array.append((disk.source, disk.image_id))
             elif hasattr(disk, 'image_id') and hasattr(disk, 'pool_name'):
-                disk_array.append(
+                disk_array.append((
                         '{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
                             pool=disk.pool_name, image_id=disk.image_id,
-                            vm_id=vm_id, disk_id=disk.disk_id))
+                            vm_id=vm_id, disk_id=disk.disk_id), False))
             elif hasattr(disk, 'image_id') and hasattr(disk, 'source'):
-                disk_array.append('{source}-{vm_id}-{disk_id}'.format(
-                    source=disk.source, vm_id=vm_id, disk_id=disk.disk_id))
+                disk_array.append(('{source}-{vm_id}-{disk_id}'.format(
+                    source=disk.source, vm_id=vm_id, disk_id=disk.disk_id),
+                    False))
         return disk_array
 
     def _check_image_for_backup(self, image):
@@ -72,7 +73,9 @@ class nebula_rbd_metadata(object):
         """
         Sync metadata from nebula template variables to rbd metadata
         """
-        for vm in self._one.vms():
+        vms = self._one.vms()
+        images = self._one.images()
+        for vm in vms:
             vm_backup_flag = self._check_vm_for_backup(vm)
             log.debug(
                 "checking vm id: {id} name: '{name}'"
@@ -80,24 +83,39 @@ class nebula_rbd_metadata(object):
                     id=vm.id, name=vm.name, neb_backup=vm_backup_flag))
             try:
                 self._check_for_disks(vm)
-                for disk_imagespec in self._get_disk_names(vm):
+                for (disk_imagespec, persistent_id) in self._get_disks(vm):
                     try:
                         log.debug("checking disk {imagespec}".format(
                             imagespec=disk_imagespec))
                         disk_metadata_lower = self._ceph.get_metadata(
                             imagespec=disk_imagespec, key='backup').lower()
+                        if not vm_backup_flag and persistent_id:
+                            log.debug("skipping disk {id}, defer to image"
+                                      " backup flag".format(id=persistent_id))
+                            continue
+                        elif vm_backup_flag and persistent_id:
+                            image = [image for image in images if
+                                     image.id == persistent_id][0]
+                            image_backup_flag = self._check_image_for_backup(
+                                image)
+                            if not image_backup_flag:
+                                log.debug("adding backup true to image"
+                                          " {id}".format(id=image.id))
+                                image.update('<TEMPLATE><BACKUP>True</BACKUP>'
+                                             '</TEMPLATE>', Merge=True)
                         if vm_backup_flag and disk_metadata_lower != 'true':
                             log.info(
-                                'setting disk {imagespec} to backup true'.format(
-                                    imagespec=disk_imagespec))
+                                'setting disk {imagespec} to backup'
+                                ' true'.format(imagespec=disk_imagespec))
                             self._ceph.set_metadata(
                                 imagespec=disk_imagespec, key='backup',
                                 value='true')
                             continue
-                        if (not vm_backup_flag and disk_metadata_lower == 'true'):
+                        if (not vm_backup_flag and
+                                disk_metadata_lower == 'true'):
                             log.info(
-                                'setting disk {imagespec} to backup false'.format(
-                                    imagespec=disk_imagespec))
+                                'setting disk {imagespec} to backup'
+                                ' false'.format(imagespec=disk_imagespec))
                             self._ceph.set_metadata(
                                 imagespec=disk_imagespec, key='backup',
                                 value='false')
@@ -112,7 +130,7 @@ class nebula_rbd_metadata(object):
                         e.log(warn=True)
             except exception.NoDisksError as e:
                 e.log(warn=True)
-        for image in self._one.images():
+        for image in images:
             image_backup_flag = self._check_image_for_backup(image)
             log.debug(
                 "checking image id: {id} name: '{name}' source: {source}"
@@ -120,6 +138,10 @@ class nebula_rbd_metadata(object):
                     id=image.id, name=image.name, source=image.source,
                     neb_backup=image_backup_flag))
             try:
+                if not image_backup_flag and image.vm_ids:
+                    log.debug("skipping image {id}, defer to vm backup"
+                              " flag".format(id=image.id))
+                    continue
                 image_metadata_lower = self._ceph.get_metadata(
                     imagespec=image.source, key='backup').lower()
                 if image_backup_flag and image_metadata_lower != 'true':
