@@ -102,20 +102,18 @@ class nebula_rbd_metadata(object):
                                 vmid=vm.id, imagespec=disk_imagespec))
                         disk_metadata_lower = self._ceph.get_metadata(
                             imagespec=disk_imagespec, key='backup').lower()
-                        if not vm_backup_flag and persistent_id:
-                            # vm not set for backup has a persistent disk
-                            # so ignore here
-                            log.debug("skipping persistent disk image {id}"
-                                      " because this vm not set for backup,"
-                                      " defer to image backup flag".format(
-                                          id=persistent_id))
-                            continue
-                        elif persistent_id:
+                        if persistent_id:
                             # handle persistent vm disks differently:
                             image = [image for image in images if
                                      image.id == int(persistent_id)][0]
                             image_backup_flag = self._check_image_for_backup(
                                 image)
+                            if not vm_backup_flag and image_backup_flag:
+                                log.debug("skipping persistent disk image {id}"
+                                          " because this vm not set to backup,"
+                                          " defer to image backup flag".format(
+                                              id=persistent_id))
+                                continue
                             if vm_backup_flag and not image_backup_flag:
                                 log.info("adding backup true to nebula"
                                          " template for persistent disk"
@@ -123,7 +121,16 @@ class nebula_rbd_metadata(object):
                                          " for backup".format(
                                              id=image.id))
                                 self._one.update_image_template(
-                                    image, 'BACKUP', 'True')
+                                    image, 'BACKUP', 'true')
+                            if not vm_backup_flag and not image_backup_flag:
+                                log.info(
+                                    "setting persistent disk to backup false"
+                                    " because both vm and image set to false,"
+                                    " vm {vmid} and image {imageid}".format(
+                                        vm=vm.id,
+                                        imageid=image.id))
+                                self._one.update_image_template(
+                                    image, 'BACKUP', 'false')
                             if (vm_backup_flag and
                                     disk_metadata_lower != 'true'):
                                 self._set_imagespec_backup_metadata(
