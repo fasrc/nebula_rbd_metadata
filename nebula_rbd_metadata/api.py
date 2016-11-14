@@ -98,10 +98,14 @@ class nebula_rbd_metadata(object):
                         disk_metadata_lower = self._ceph.get_metadata(
                             imagespec=disk_imagespec, key='backup').lower()
                         if not vm_backup_flag and persistent_id:
+                            # vm not set for backup has a persistent disk
+                            # so ignore here
                             log.debug("skipping disk {id}, defer to image"
                                       " backup flag".format(id=persistent_id))
                             continue
                         elif vm_backup_flag and persistent_id:
+                            # vm set for backup with a persistent disk
+                            # so update the image
                             image = [image for image in images if
                                      image.id == persistent_id][0]
                             image_backup_flag = self._check_image_for_backup(
