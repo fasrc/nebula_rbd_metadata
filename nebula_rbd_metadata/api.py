@@ -159,6 +159,7 @@ class nebula_rbd_metadata(object):
                         e.log(warn=True)
             except exception.NoDisksError as e:
                 e.log(warn=True)
+        images = self._one.images()
         for image in images:
             image_backup_flag = self._check_image_for_backup(image)
             log.debug(
