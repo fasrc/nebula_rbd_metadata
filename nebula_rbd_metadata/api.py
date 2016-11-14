@@ -108,7 +108,7 @@ class nebula_rbd_metadata(object):
                             # vm set for backup with a persistent disk
                             # so update the image
                             image = [image for image in images if
-                                     image.id == persistent_id][0]
+                                     image.id == int(persistent_id)][0]
                             image_backup_flag = self._check_image_for_backup(
                                 image)
                             if not image_backup_flag:
