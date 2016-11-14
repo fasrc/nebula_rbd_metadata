@@ -69,6 +69,14 @@ class nebula_rbd_metadata(object):
         """
         return image.source
 
+    def _set_imagespec_backup_metadata(self, imagespec, value):
+        log.info(
+            'setting disk {imagespec} to backup'
+            ' {value}'.format(imagespec=imagespec, value=value))
+        self._ceph.set_metadata(
+            imagespec=imagespec, key='backup',
+            value=value)
+
     def sync(self):
         """
         Sync metadata from nebula template variables to rbd metadata
@@ -104,21 +112,17 @@ class nebula_rbd_metadata(object):
                                 image.update('<TEMPLATE><BACKUP>True</BACKUP>'
                                              '</TEMPLATE>', Merge=True)
                         if vm_backup_flag and disk_metadata_lower != 'true':
-                            log.info(
-                                'setting disk {imagespec} to backup'
-                                ' true'.format(imagespec=disk_imagespec))
-                            self._ceph.set_metadata(
-                                imagespec=disk_imagespec, key='backup',
-                                value='true')
+                            # vm set for backup and disk doesn't have
+                            # metadata true
+                            self._set_imagespec_backup_metadata(
+                                disk_imagespec, 'true')
                             continue
                         if (not vm_backup_flag and
                                 disk_metadata_lower == 'true'):
-                            log.info(
-                                'setting disk {imagespec} to backup'
-                                ' false'.format(imagespec=disk_imagespec))
-                            self._ceph.set_metadata(
-                                imagespec=disk_imagespec, key='backup',
-                                value='false')
+                            # vm set to not get backed up and disk is
+                            # set for backup
+                            self._set_imagespec_backup_metadata(
+                                disk_imagespec, 'false')
                             continue
                         log.debug(
                             "OK vmid: {id} rbd disk: {disk}"
@@ -145,18 +149,13 @@ class nebula_rbd_metadata(object):
                 image_metadata_lower = self._ceph.get_metadata(
                     imagespec=image.source, key='backup').lower()
                 if image_backup_flag and image_metadata_lower != 'true':
-                    log.info(
-                        'setting image {imagespec} to backup true'.format(
-                            imagespec=image.source))
-                    self._ceph.set_metadata(
-                        imagespec=image.source, key='backup', value='true')
+                    # image set to be backed up but rbd doesn't have
+                    # metadata true
+                    self._set_imagespec_backup_metadata(image.source, 'true')
                     continue
                 if (not image_backup_flag and image_metadata_lower == 'true'):
-                    log.info(
-                        'setting image {imagespec} to backup false'.format(
-                            imagespec=image.source))
-                    self._ceph.set_metadata(
-                        imagespec=image.source, key='backup', value='false')
+                    # image set to be not backed up and rbd has metadata true
+                    self._set_imagespec_backup_metadata(image.source, 'false')
                     continue
                 log.debug(
                     "OK image: {id} rbd device: {source}"
