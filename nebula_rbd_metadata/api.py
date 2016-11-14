@@ -127,7 +127,7 @@ class nebula_rbd_metadata(object):
                                     "setting persistent disk to backup false"
                                     " because both vm and image set to false,"
                                     " vm {vmid} and image {imageid}".format(
-                                        vm=vm.id,
+                                        vmid=vm.id,
                                         imageid=image.id))
                                 self._one.update_image_template(
                                     image, 'BACKUP', 'false')
