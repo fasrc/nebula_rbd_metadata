@@ -93,8 +93,9 @@ class nebula_rbd_metadata(object):
                 self._check_for_disks(vm)
                 for (disk_imagespec, persistent_id) in self._get_disks(vm):
                     try:
-                        log.debug("checking disk {imagespec}".format(
-                            imagespec=disk_imagespec))
+                        log.debug(
+                            "checking vm id {vmid} disk {imagespec}".format(
+                                vmid=vm.id, imagespec=disk_imagespec))
                         disk_metadata_lower = self._ceph.get_metadata(
                             imagespec=disk_imagespec, key='backup').lower()
                         if not vm_backup_flag and persistent_id:
@@ -111,10 +112,11 @@ class nebula_rbd_metadata(object):
                             image_backup_flag = self._check_image_for_backup(
                                 image)
                             if not image_backup_flag:
-                                log.debug("adding backup true to image"
-                                          " {id}".format(id=image.id))
-                                image.update('<TEMPLATE><BACKUP>True</BACKUP>'
-                                             '</TEMPLATE>', Merge=True)
+                                log.debug("adding backup true to nebula"
+                                          " template for image {id}".format(
+                                              id=image.id))
+                                self._one.update_image_template(
+                                    image, 'BACKUP', 'True')
                         if vm_backup_flag and disk_metadata_lower != 'true':
                             # vm set for backup and disk doesn't have
                             # metadata true
