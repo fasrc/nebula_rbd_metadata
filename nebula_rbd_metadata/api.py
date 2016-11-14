@@ -67,6 +67,15 @@ class nebula_rbd_metadata(object):
                 return True
         return False
 
+    def _check_image_for_nonbackup(self, image):
+        """
+        Checks for image template variable BACKUP=false
+        """
+        if hasattr(image.template, 'backup'):
+            if image.template.backup.lower() == 'false':
+                return True
+        return False
+
     def _get_image_imagespec(self, image):
         """
         Gets the rbd device in imagespec format for an opennebula image
@@ -173,7 +182,14 @@ class nebula_rbd_metadata(object):
                 if image.persistent and not image_backup_flag and image.vm_ids:
                     # persistent disk not set for backup,
                     # defer to vm backup flags
-                    log.debug("skipping image {id}, defer to vm backup"
+                    if (self._check_image_for_nonbackup(image) and
+                        image_metadata_lower == 'true'):
+                        # unless if a user manually sets False in template,
+                        # set rbd metadata false
+                        self._set_imagespec_backup_metadata(
+                            image.source, 'false')
+                    else:
+                        log.debug("skipping image {id}, defer to vm backup"
                               " flag".format(id=image.id))
                     continue
                 if image_backup_flag and image_metadata_lower != 'true':
