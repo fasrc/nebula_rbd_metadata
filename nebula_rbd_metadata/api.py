@@ -148,12 +148,14 @@ class nebula_rbd_metadata(object):
                     id=image.id, name=image.name, source=image.source,
                     neb_backup=image_backup_flag))
             try:
-                if not image_backup_flag and image.vm_ids:
+                image_metadata_lower = self._ceph.get_metadata(
+                    imagespec=image.source, key='backup').lower()
+                if image.persistent and not image_backup_flag and image.vm_ids:
+                    # persistent disk not set for backup,
+                    # defer to vm backup flags
                     log.debug("skipping image {id}, defer to vm backup"
                               " flag".format(id=image.id))
                     continue
-                image_metadata_lower = self._ceph.get_metadata(
-                    imagespec=image.source, key='backup').lower()
                 if image_backup_flag and image_metadata_lower != 'true':
                     # image set to be backed up but rbd doesn't have
                     # metadata true
