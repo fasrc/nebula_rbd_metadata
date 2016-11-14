@@ -119,10 +119,10 @@ class nebula_rbd_metadata(object):
                                 image)
                             if not image_backup_flag:
                                 log.info("adding backup true to nebula"
-                                          " template for persistent disk"
-                                          " image {id} because this vm set"
-                                          " for backup".format(
-                                              id=image.id))
+                                         " template for persistent disk"
+                                         " image {id} because this vm set"
+                                         " for backup".format(
+                                             id=image.id))
                                 self._one.update_image_template(
                                     image, 'BACKUP', 'True')
                             if disk_metadata_lower != 'true':
