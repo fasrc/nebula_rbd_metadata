@@ -118,7 +118,7 @@ class nebula_rbd_metadata(object):
                             image_backup_flag = self._check_image_for_backup(
                                 image)
                             if not image_backup_flag:
-                                log.debug("adding backup true to nebula"
+                                log.info("adding backup true to nebula"
                                           " template for persistent disk"
                                           " image {id} because this vm set"
                                           " for backup".format(
