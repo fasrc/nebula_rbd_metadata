@@ -129,8 +129,9 @@ class nebula_rbd_metadata(object):
                                     " vm {vmid} and image {imageid}".format(
                                         vmid=vm.id,
                                         imageid=image.id))
-                                self._one.update_image_template(
-                                    image, 'BACKUP', 'false')
+                                self._set_imagespec_backup_metadata(
+                                    disk_imagespec, 'false')
+                                continue
                             if (vm_backup_flag and
                                     disk_metadata_lower != 'true'):
                                 self._set_imagespec_backup_metadata(
