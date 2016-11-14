@@ -128,6 +128,13 @@ class nebula_rbd_metadata(object):
                             if disk_metadata_lower != 'true':
                                 self._set_imagespec_backup_metadata(
                                     disk_imagespec, 'true')
+                            else:
+                                log.debug(
+                                    "OK vmid: {id} rbd disk: {disk}"
+                                    " already has rbd metadata"
+                                    " backup='{rbd_backup}'".format(
+                                        id=vm.id, disk=disk_imagespec,
+                                        rbd_backup=disk_metadata_lower))
                             continue
                         if vm_backup_flag and disk_metadata_lower != 'true':
                             # vm set for backup and disk doesn't have
