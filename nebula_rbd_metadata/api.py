@@ -33,7 +33,8 @@ class nebula_rbd_metadata(object):
 
     def _get_disks(self, vm):
         """
-        Returns an array of rbd devices
+        Returns an array of rbd device tuples:
+        (<disk imagespec>, <persistent image id or False>)
         """
         vm_id = vm.id
         # log.debug("vm " + str(vm_id))
@@ -42,13 +43,16 @@ class nebula_rbd_metadata(object):
             # log.debug(disk)
             if (hasattr(disk, 'image_id') and hasattr(disk, 'clone') and
                     hasattr(disk, 'source') and disk.clone == 'NO'):
+                # this vm disk is persistent - add tuple with image id
                 disk_array.append((disk.source, disk.image_id))
             elif hasattr(disk, 'image_id') and hasattr(disk, 'pool_name'):
+                # this vm disk name based off of pool_name
                 disk_array.append((
                         '{pool}/one-{image_id}-{vm_id}-{disk_id}'.format(
                             pool=disk.pool_name, image_id=disk.image_id,
                             vm_id=vm_id, disk_id=disk.disk_id), False))
             elif hasattr(disk, 'image_id') and hasattr(disk, 'source'):
+                # this vm disk name based off of source
                 disk_array.append(('{source}-{vm_id}-{disk_id}'.format(
                     source=disk.source, vm_id=vm_id, disk_id=disk.disk_id),
                     False))
@@ -101,8 +105,10 @@ class nebula_rbd_metadata(object):
                         if not vm_backup_flag and persistent_id:
                             # vm not set for backup has a persistent disk
                             # so ignore here
-                            log.debug("skipping disk {id}, defer to image"
-                                      " backup flag".format(id=persistent_id))
+                            log.debug("skipping persistent disk image {id}"
+                                      " because this vm not set for backup,"
+                                      " defer to image backup flag".format(
+                                          id=persistent_id))
                             continue
                         elif vm_backup_flag and persistent_id:
                             # vm set for backup with a persistent disk
@@ -113,7 +119,9 @@ class nebula_rbd_metadata(object):
                                 image)
                             if not image_backup_flag:
                                 log.debug("adding backup true to nebula"
-                                          " template for image {id}".format(
+                                          " template for persistent disk"
+                                          " image {id} because this vm set"
+                                          " for backup".format(
                                               id=image.id))
                                 self._one.update_image_template(
                                     image, 'BACKUP', 'True')
