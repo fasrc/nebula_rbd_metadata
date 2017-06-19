@@ -45,13 +45,15 @@ Set these environment variables (can also set as CLI flags, see below), key part
 Also note this is designed to be run on a host that already has access to the Ceph cluster that is used by OpenNebula.
 
 ```
-NEB_RBD_MET_DEBUG
-NEB_RBD_MET_SYSLOG
-NEB_RBD_MET_ONE_ADDRESS
-NEB_RBD_MET_ONE_SECRET
-NEB_RBD_MET_ONE_PROXY
-NEB_RBD_MET_CEPH_CLUSTER
-NEB_RBD_MET_CEPH_USER
+NEB_RBD_MET_DEBUG          enable debug output
+NEB_RBD_MET_SYSLOG         enable logging to syslog, default false (stdout only)
+NEB_RBD_MET_ONE_ADDRESS    ONE controller host address
+NEB_RBD_MET_ONE_SECRET     ONE credentials to use (e.g. user:key, or
+                           /path/to/one_auth), default
+                           /var/lib/one/.one/one_auth
+NEB_RBD_MET_ONE_PROXY      proxy host to use to connect to ONE controller
+NEB_RBD_MET_CEPH_CLUSTER   ceph cluster, default ceph
+NEB_RBD_MET_CEPH_USER      ceph user, default admin
 ```
 
 
